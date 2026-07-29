@@ -1,12 +1,20 @@
 import { useState } from 'react'
+import ExpenseButton from './components/expensebutton'
+import DarkModeToggle from './components/darkmodetoggle'
 
 
 function App() {
-  const [count, setCount] = useState(0)
+
 
   return (
     <>
-     <h1 className='text-6xl text-yellow-900'>hello there!</h1>
+      <div className="flex gap-2 justify-center items-center">
+        <ExpenseButton />
+        <DarkModeToggle />
+      </div>
+      <div className="text-black dark:text-white p-100">
+        hello
+      </div>
     </>
   )
 }
