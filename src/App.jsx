@@ -9,10 +9,12 @@ function App() {
 
   return (
     <>
-      <div className="flex gap-2 justify-center items-center">
+      <div className="">
         <ScrollToTopButton />
         <ExpenseButton />
-        <DarkModeToggle />
+        <div className="fixed bottom-5 right-5">
+          <DarkModeToggle />
+        </div>
       </div>
     </>
   )
