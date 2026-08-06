@@ -3,6 +3,7 @@ import ExpenseButton from './components/expensebutton'
 import DarkModeToggle from './components/darkmodetoggle'
 import ScrollToTopButton from './components/ScrollToTopButton'
 import PieChart from './components/piechart'
+import Landing from './pages/landing'
 
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
       <div className="">
         <ScrollToTopButton />
         <ExpenseButton />
-        <PieChart />
+        {/* <PieChart /> */}
+        <Landing />
         <div className="fixed bottom-5 right-5">
           <DarkModeToggle />
         </div>

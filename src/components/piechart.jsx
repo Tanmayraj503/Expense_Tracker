@@ -1,23 +1,22 @@
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
 import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-
-export default function PieChart({ medical, transport, food, drinks, others }) {
+export default function Piechart({ medical, transport, food, drinks, others }) {
   const data = {
     labels: ['Medical', 'Transport', 'Food', 'Drinks', 'Others'],
     datasets: [
       {
-        label: 'Budget Allocation ($)',
-        data: [medical, transport, food, drinks, others],
+        label: 'Expense (₹)',
+        data: [10, 15, 30, 5, 23],
         backgroundColor: [
-          'rgba(59, 130, 246, 0.8)',
-          'rgba(16, 185, 129, 0.8)',
-          'rgba(245, 158, 11, 0.8)',
-          'rgba(139, 92, 246, 0.8)',
-          'rgba(239, 68, 68, 0.8)',
+          'rgba(59,130,246,0.85)',
+          'rgba(16,185,129,0.85)',
+          'rgba(245,158,11,0.85)',
+          'rgba(139,92,246,0.85)',
+          'rgba(239,68,68,0.85)',
         ],
         borderColor: '#ffffff',
         borderWidth: 2,
@@ -28,34 +27,26 @@ export default function PieChart({ medical, transport, food, drinks, others }) {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // ← needs a fixed-height parent, handled below
+    maintainAspectRatio: true,
     plugins: {
       legend: {
         position: 'bottom',
-        labels: {
-          font: { family: 'ui-sans-serif, system-ui, sans-serif', size: 12 },
-          boxWidth: 15,
-          padding: 20,
-        },
+        labels: { font: { size: 12 }, boxWidth: 15, padding: 20 },
       },
     },
   };
 
   return (
     <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '24px',
-      background: '#fff',
-      border: '1px solid #f1f5f9',
-      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-      borderRadius: '16px',
       maxWidth: '420px',
-      margin: '0 auto 32px',
+      margin: '0 auto',
+      padding: '24px',
+      background: '#ffffff',
+      border: '0.5px solid #e2e8f0',
+      borderRadius: '16px',
     }}>
-      <div style={{ marginBottom: '16px', textAlign: 'center' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+      <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 500, margin: 0, color: '#1e293b' }}>
           Q3 Department Expenses
         </h3>
         <p style={{ fontSize: '12px', color: '#94a3b8', margin: '4px 0 0' }}>
@@ -63,8 +54,8 @@ export default function PieChart({ medical, transport, food, drinks, others }) {
         </p>
       </div>
 
-      {/* ✅ Fixed pixel height — this is what was missing */}
-      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
+      {/* Fixed pixel height — critical for maintainAspectRatio: false */}
+      <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
         <Pie data={data} options={options} />
       </div>
     </div>
