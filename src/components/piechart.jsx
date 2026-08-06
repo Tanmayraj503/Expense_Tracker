@@ -1,46 +1,39 @@
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
-// 1. Register the required Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-export default function PieChart() {
-  // 2. Define your data mapping
+
+export default function PieChart({ medical, transport, food, drinks, others }) {
   const data = {
-    labels: ['Marketing', 'Development', 'Design', 'Operations', 'Legal'],
+    labels: ['Medical', 'Transport', 'Food', 'Drinks', 'Others'],
     datasets: [
       {
         label: 'Budget Allocation ($)',
-        data:[10, 20, 30, 40],
+        data: [medical, transport, food, drinks, others],
         backgroundColor: [
-          'rgba(59, 130, 246, 0.8)',  // Tailwind blue-500
-          'rgba(16, 185, 129, 0.8)',  // Tailwind emerald-500
-          'rgba(245, 158, 11, 0.8)',  // Tailwind amber-500
-          'rgba(139, 92, 246, 0.8)',  // Tailwind violet-500
-          'rgba(239, 68, 68, 0.8)',   // Tailwind red-500
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(139, 92, 246, 0.8)',
+          'rgba(239, 68, 68, 0.8)',
         ],
-        borderColor: [
-          '#ffffff', // White borders between slices
-        ],
+        borderColor: '#ffffff',
         borderWidth: 2,
         hoverOffset: 10,
       },
     ],
   };
 
-  // 3. Define configuration options
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // Allows Tailwind utilities to control height completely
+    maintainAspectRatio: false, // ← needs a fixed-height parent, handled below
     plugins: {
       legend: {
         position: 'bottom',
         labels: {
-          font: {
-            family: 'ui-sans-serif, system-ui, sans-serif', // Matches Tailwind default font
-            size: 12,
-          },
+          font: { family: 'ui-sans-serif, system-ui, sans-serif', size: 12 },
           boxWidth: 15,
           padding: 20,
         },
@@ -49,15 +42,29 @@ export default function PieChart() {
   };
 
   return (
-    // 4. Styled layout container using Tailwind CSS
-    <div className="flex flex-col items-center justify-center p-6 bg-white border border-slate-100 shadow-xl rounded-2xl max-w-md mx-auto">
-      <div className="mb-4 text-center">
-        <h3 className="text-lg font-bold text-slate-800">Q3 Department Expenses</h3>
-        <p className="text-xs text-slate-400">Live resource tracking overview</p>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '24px',
+      background: '#fff',
+      border: '1px solid #f1f5f9',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+      borderRadius: '16px',
+      maxWidth: '420px',
+      margin: '0 auto 32px',
+    }}>
+      <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+          Q3 Department Expenses
+        </h3>
+        <p style={{ fontSize: '12px', color: '#94a3b8', margin: '4px 0 0' }}>
+          Live resource tracking overview
+        </p>
       </div>
-      
-      {/* Chart Canvas Wrapper - Controls size dynamically */}
-      <div className="relative w-full h-64 sm:h-72">
+
+      {/* ✅ Fixed pixel height — this is what was missing */}
+      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
         <Pie data={data} options={options} />
       </div>
     </div>
