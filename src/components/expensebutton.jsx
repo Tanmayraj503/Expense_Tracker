@@ -18,7 +18,7 @@ export default function ExpenseButton() {
           </div>
           
 
-          <div className="flex bg-amber-100 p-[2px] rounded-full mx-4 font-semibold mb-4">
+          <div className="flex bg-amber-100 p-0.5 rounded-full mx-4 font-semibold mb-4">
             <button className="active:bg-orange-500 w-[50%] rounded-full  text-black focus:text-white py-3 cursor-pointer">Expense</button>
             <button className="active:bg-orange-500  rounded-full w-[50%]  text-black focus:text-white py-3  cursor-pointer">Income</button>
           </div>

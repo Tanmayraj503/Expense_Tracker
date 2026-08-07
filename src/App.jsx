@@ -16,7 +16,7 @@ function App() {
         <ExpenseButton />
         {/* <PieChart /> */}
         <Landing />
-        <div className="fixed bottom-5 right-5">
+        <div className="fixed top-5 right-5">
           <DarkModeToggle />
         </div>
       </div>

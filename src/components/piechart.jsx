@@ -4,23 +4,27 @@ import { Pie } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-export default function Piechart({ medical, transport, food, drinks, others }) {
+export default function Piechart({ Housing, Food, Transport, Health, Entertainment, Shopping, Utilities, Drinks, Others }) {
   const data = {
-    labels: ['Medical', 'Transport', 'Food', 'Drinks', 'Others'],
+    labels: ['Housing', 'Food', 'Transport', 'Health', 'Entertainment', 'Shopping', 'Utilities', 'Drinks', 'Others'],
     datasets: [
       {
         label: 'Expense (₹)',
-        data: [10, 15, 30, 5, 23],
+        data: [Housing, Food, Transport, Health, Entertainment, Shopping, Utilities, Drinks, Others],
         backgroundColor: [
-          'rgba(59,130,246,0.85)',
-          'rgba(16,185,129,0.85)',
-          'rgba(245,158,11,0.85)',
-          'rgba(139,92,246,0.85)',
-          'rgba(239,68,68,0.85)',
+          'rgb(230, 25, 75)',
+          'rgb(60, 180, 75)',
+          'rgb(255, 225, 25)',
+          'rgb(67, 99, 216)',
+          'rgb(245, 130, 49)',
+          'rgb(145, 30, 180)',
+          'rgb(66, 212, 244)',
+          'rgb(240, 50, 230)',
+          'rgb(191, 239, 69)',
         ],
-        borderColor: '#ffffff',
+        borderColor: '#221E1A',
         borderWidth: 2,
-        hoverOffset: 10,
+        hoverOffset: 12,
       },
     ],
   };
@@ -37,25 +41,18 @@ export default function Piechart({ medical, transport, food, drinks, others }) {
   };
 
   return (
-    <div style={{
-      maxWidth: '420px',
-      margin: '0 auto',
-      padding: '24px',
-      background: '#ffffff',
-      border: '0.5px solid #e2e8f0',
-      borderRadius: '16px',
-    }}>
+    <div 
+    className='dark:border-[#605448] dark:bg-[#221E1A] max-w-105 m-auto p-6 border-2 rounded-2xl'>
       <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 500, margin: 0, color: '#1e293b' }}>
-          Q3 Department Expenses
+        <h3 className='text-black text-[18px] font-medium mb-1 dark:text-gray-300 '>
+          Monthly Expenses
         </h3>
-        <p style={{ fontSize: '12px', color: '#94a3b8', margin: '4px 0 0' }}>
+        {/* <p style={{ fontSize: '12px', color: '#94a3b8', margin: '4px 0 0' }}>
           Live resource tracking overview
-        </p>
+        </p> */}
       </div>
 
-      {/* Fixed pixel height — critical for maintainAspectRatio: false */}
-      <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
+      <div>
         <Pie data={data} options={options} />
       </div>
     </div>
