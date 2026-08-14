@@ -10,6 +10,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { useMemo } from 'react';
 
 // Register the required Chart.js modules
 ChartJS.register(
@@ -22,49 +23,47 @@ ChartJS.register(
     Legend
 );
 
-const LineChart = () => {
-    // 1. Define X-axis labels
-    ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((index, month) => {
+const LineChart = ({ selectedMonth = 'July', expenseData = [0, 0, 0, 6121, 6600, 6356, 6667, 0, 0, 0, 0, 0] }) => {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
-const data = {
-    labels: labels,
+  const data = useMemo(() => ({
+    labels: months,
     datasets: [
-        {
-            label: 'Monthly Expense (₹)',
-            data: [0, 0, 0, 6121, 6600, 6356, 6667],
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            tension: 0.3, // Adds a slight curve to the line
-            fill: false,   // Fills the area under the line
-        },
+      {
+        label: `${selectedMonth} Expense (₹)`,
+        data: expenseData,              // ✅ must have exactly 12 values
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.3,
+        fill: false,
+        spanGaps: true,                 // ✅ connects line across null/missing values
+        pointRadius: 5,                 // ✅ makes all points visible including zeros
+        pointHoverRadius: 7,
+      },
     ],
-};});
+  }), [selectedMonth, expenseData]);
 
-
-// 3. Customize behavior and scales
-const options = {
+  const options = {
     responsive: true,
-    plugins: {
-        legend: {
-            position: 'top',
-        },
-        title: {
-            display: true,
-            text: `Monthly Expense of user`,
-        },
-    },
     scales: {
-        y: {
-            beginAtZero: true,
-        },
+      y: {
+        beginAtZero: true,             // ✅ ensures 0 values are visible on the line
+      },
     },
-};
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: { mode: 'index', intersect: false },
+    },
+  };
 
-return (
-    <div style={{ width: '600px', margin: '0 auto' }}>
-        <Line data={data} options={options} />
-    </div>
-);
+    return (
+        <div style={{ width: '600px', margin: '0 auto' }}>
+            <Line data={data} options={options} />
+        </div>
+    );
 };
 
 export default LineChart;
