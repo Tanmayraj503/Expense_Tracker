@@ -16,8 +16,8 @@ function App() {
         <ScrollToTopButton />
         <ExpenseButton />
         {/* <PieChart /> */}
-        <LineChart/>
-        <Landing />
+        {/* <LineChart/>
+        <Landing /> */}
         <div className="fixed top-5 right-5">
           <DarkModeToggle />
         </div>

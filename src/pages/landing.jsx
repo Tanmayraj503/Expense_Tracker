@@ -89,6 +89,7 @@ export default function ExpenseTracker() {
             return acc;
         }, {});
 
+        
     return (
         <>
             <div className="font-sans bg-[#0f1117] min-h-screen px-5 py-7 text-slate-200 max-w-3xl mx-auto">
