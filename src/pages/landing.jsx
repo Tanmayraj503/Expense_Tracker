@@ -54,7 +54,7 @@ export default function ExpenseTracker() {
 
     function validate() {
         const errs = {};
-        if (!form.description.trim()) errs.description = "Required";
+        // if (!form.description.trim()) errs.description = "Required";
         if (!form.category) errs.category = "Required";
         if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0) errs.amount = "Enter a valid amount";
         if (!form.date) errs.date = "Required";
