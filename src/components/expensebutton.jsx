@@ -3,8 +3,8 @@ const EMPTY_FORM = { type: "expense", description: "", amount: "", category: "",
 
 export default function ExpenseButton() {
   const initialState = {
-    entries: [],
-    nextId: 1
+    entries: JSON.parse(localStorage.getItem("entries") || "[]"),
+    nextId: JSON.parse(localStorage.getItem("nextId") || "1"),
   };
 
   const [form, setForm] = useState(EMPTY_FORM);
@@ -20,29 +20,40 @@ export default function ExpenseButton() {
           nextId: state.nextId + 1,
         };
       case "DELETE_ENTRY":
-        return { ...state, entries: state.entries.filter((e) => e.id !== action.id) };
-      default:
-        return state;
+        const updated = state.entries.filter((e) => e.id !== action.id);
+        localStorage.setItem("entries", JSON.stringify(updated));
+        return { ...state, entries: updated };
     }
   }
 
   const categories = {
-    income: ["Salary", "Freelance", "Investment", "Business", "Gift", "Other"],
+    income: ["Salary", "Freelance", "Investment", "Business", "Gift", "Savings", "Other"],
     expense: ["Housing", "Food", "Transport", "Health", "Entertainment", "Shopping", "Utilities", "Other"],
   };
 
-  const payment_method = ["UPI", "Cash", "Card (Rupay/Visa/Master)", "Bank-to-Bank transfer"];
+  const payment_method = ["UPI", "Cash", "Debit/Credit Card", "BTB transfer"];
 
-  const txns = [];
+  // function txns(){
+  //  const raj = txn();
+  //  console.log(raj);
+  // }
 
-  const txn = {
-    id: Date.now(),
-    type: form.type,
-    description: form.description,
-    amount: form.amount,
-    category: form.category,
-    date: form.date,
+  const txn = (form) => {
+    return {
+      id: Date.now(),
+      type: form.type,
+      pay_method: form.pay_method,
+      description: form.description,
+      amount: form.amount,
+      category: form.category,
+      date: form.date,
+    };
   };
+
+  // const getform = () => {
+  //   const wedguj = JSON.parse(localStorage.getItem("enteries"));
+  //   console.log(wedguj);
+  // }
 
   function handleChange(field, value) {
     setForm((f) => ({ ...f, [field]: value, ...(field === "type" ? { category: "" } : {}) }));
@@ -62,29 +73,35 @@ export default function ExpenseButton() {
   function handleSubmit() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    dispatch({ type: "ADD_ENTRY", payload: { ...form, amount: parseFloat(form.amount) } });
+    // console.log(form);
+    const raj = txn(form);
+    const newEntries = [raj, ...state.entries];
+    console.log(newEntries);
+    dispatch({ type: "ADD_ENTRY", payload: raj });
+    localStorage.setItem("entries", JSON.stringify(newEntries));
+    localStorage.setItem("nextId", state.nextId + 1);
     setForm(EMPTY_FORM);
     setErrors({});
   }
 
-  const savetolocal = () => { }
 
   const fmt = (n) => n.toLocaleString("en-IN", { style: "currency", currency: "INR" });
   const fmtDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   const filtered = filter === "all" ? state.entries : state.entries.filter((e) => e.type === filter);
 
+
   return (
     <>
       <div className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-7 mx-7 items-start">
         <div className="">
-          <div className="rounded-xl border-2 border-gray-500 dark:border-[#605448] p-3.5 dark:bg-[#221E1A] h-full w-127.5">
+          <div className="rounded-xl border-2 border-gray-500 dark:border-[#605448] p-3.5 dark:bg-[#221E1A] h-full lg:w-127.5">
 
             <div className=" px-4 my-3 mb-4">
               <span className="font-bold my-3 text-xl text-orange-500">Add Transaction</span>
             </div>
 
-            <div className="flex bg-amber-100 p-0.5 rounded-full mx-4 font-semibold mb-4">
+            <div className="flex bg-gray-200 p-0.5 rounded-full mx-4 font-semibold mb-4">
               {["income", "expense"].map((t) => {
                 const isActive = form.type === t;
                 const activeClass = t === "income"
@@ -108,7 +125,7 @@ export default function ExpenseButton() {
               <div className=" dark:text-black flex flex-col gap-1 ">
                 <label className="font-semibold text-orange-500">Category</label>
                 <select
-                  className={`bg-amber-50 border-2 dark:bg-amber-100 rounded-xl appearance-none block p-3.5 ${errors.category ? "border-red-700" : ""}`}
+                  className={`bg-amber-50 border-2 dark:bg-gray-200 rounded-xl appearance-none block p-3.5 ${errors.category ? "border-red-700" : ""}`}
                   value={form.category}
                   onChange={(e) => handleChange("category", e.target.value)}
                 >
@@ -130,7 +147,7 @@ export default function ExpenseButton() {
                   value={form.amount}
                   onChange={(e) => handleChange("amount", e.target.value)}
                   required
-                  className={`${errors.amount ? "border-red-700" : ""} bg-amber-50 border-2  dark:bg-amber-100 rounded-xl p-3.5`}
+                  className={`${errors.amount ? "border-red-700" : ""} bg-amber-50 border-2  dark:bg-gray-200 rounded-xl p-3.5`}
                 />
                 {errors.amount && <span className="text-[10px] text-red-600">{errors.amount}</span>}
               </div>
@@ -143,7 +160,7 @@ export default function ExpenseButton() {
                   required
                   onChange={(e) => handleChange("date", e.target.value)}
                   value={form.date}
-                  className={`bg-amber-50  dark:bg-amber-100 rounded-xl p-3.5 [&::-webkit-calendar-picker-indicator]:invert
+                  className={`bg-amber-50  dark:bg-gray-200 rounded-xl p-3.5 [&::-webkit-calendar-picker-indicator]:invert
                    [&::-webkit-calendar-picker-indicator]:hue-rotate-180 border-2 ${errors.date ? "border-red-700" : ""}`} />
                 {errors.date && <span className="text-[10px] text-red-600">{errors.date}</span>}
               </div>
@@ -152,7 +169,7 @@ export default function ExpenseButton() {
               <div className=" dark:text-black flex flex-col gap-1 ">
                 <label className="font-semibold text-orange-500">Mode of Payment</label>
                 <select
-                  className={`bg-amber-50 dark:bg-amber-100 border-2 rounded-xl appearance-none block p-3.5 ${errors.pay_method ? "border-red-700" : ""}`}
+                  className={`bg-amber-50 dark:bg-gray-200 border-2 rounded-xl appearance-none block p-3.5 ${errors.pay_method ? "border-red-700" : ""}`}
                   value={form.pay_method}
                   onChange={(e) => handleChange("pay_method", e.target.value)}
                 >
@@ -171,7 +188,7 @@ export default function ExpenseButton() {
                   placeholder="e.g. Coffee with a friend"
                   maxLength="34"
                   value={form.description}
-                  className={`bg-amber-50 border-2 dark:bg-amber-100 rounded-xl p-3.5 ${errors.description ? "border-red-700" : ""}`}
+                  className={`bg-amber-50 border-2 dark:bg-gray-200 rounded-xl p-3.5 ${errors.description ? "border-red-700" : ""}`}
                   onChange={(e) => handleChange("description", e.target.value)}
                 />
                 {errors.description && <span className="text-[10px] text-red-600">{errors.description}</span>}
@@ -200,32 +217,31 @@ export default function ExpenseButton() {
                 return (
                   <button
                     key={f}
-                    className={`flex px-4 py-1 text-sm font-semibold cursor-pointer bg-amber-50 dark:bg-white rounded-full 
+                    className={`flex px-4 py-1 text-sm font-semibold cursor-pointer bg-amber-50 dark:bg-gray-200 rounded-full 
                       ${isActive ? "text-orange-500  border-2 " : "text-black border-transparent hover:text-orange-500"}`}
                     onClick={() => setFilter(f)}>
                     {f.charAt(0).toUpperCase() + f.slice(1)}
                   </button>
                 )
               })}
-              <span className="ml-auto text-xs text-slate-600 pr-1 pb-2">{filtered.length} entries</span>
+              <span className="ml-auto text-xs text-gray-200 md:block hidden pr-1 pb-2">{filtered.length} entries</span>
             </div>
 
             {/* Table */}
             {filtered.length === 0
               ?
               <div className="text-center py-14">
-                <p className="text-4xl mb-3">📭</p>
                 <p className="text-orange-400 text-sm">No entries yet.</p>
               </div>
               :
-              <div className="overflow-x-auto">
+              <div className="mt-4 overflow-x-auto overflow-y-auto max-h-142">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr>
                       {["Date", "Description", "Category", "Type", "Amount", "Payment Method", ""].map((t) => (
                         <th
                           key={t}
-                          className="px-4 py-3 text-left text-[11px] font-bold tracking-widest text-slate-600 uppercase bg-[#171a27]">
+                          className="px-4 py-3 text-left text-[11px] font-bold tracking-widest text-slate-200 uppercase bg-orange-500">
                           {t}
                         </th>
                       ))}
@@ -233,7 +249,7 @@ export default function ExpenseButton() {
                   </thead>
                   <tbody>
                     {filtered.map((entry) => (
-                      <tr key={entry.id} className="border-b border-[#1a1e2e] hover:bg-[#1a1d2b] transition-colors">
+                      <tr key={entry.id} className="border-b border-[#1a1e2e] hover:bg-[#2b221a] transition-colors">
                         {/* Date */}
                         <td className="px-4 py-3 text-sm">
                           <span className="text-slate-500 text-xs whitespace-nowrap">{fmtDate(entry.date)}</span>
@@ -255,13 +271,13 @@ export default function ExpenseButton() {
                           </span>
                         </td>
                         {/* Amount */}
-                        <td className="px-4 py-3 text-sm text-right">
+                        <td className="px-4 py-3 text-sm">
                           <span className={`font-semibold font-mono text-[15px] ${entry.type === "income" ? "text-green-400" : "text-rose-400"}`}>
                             {entry.type === "income" ? "+" : "-"}{fmt(entry.amount)}
                           </span>
                         </td>
                         {/* Payment Method */}
-                        <td className="">
+                        <td className="text-sm text-center">
                           <span className={`bg-[#12151f] border border-[#2a2f45] rounded-md px-2 py-0.5 text-xs text-slate-400`}>{entry.pay_method}</span>
                         </td>
                         {/* Delete */}
