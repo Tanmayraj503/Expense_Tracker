@@ -3,7 +3,10 @@ const EMPTY_FORM = { type: "expense", description: "", amount: "", category: "",
 
 export default function ExpenseButton() {
   const initialState = {
-    entries: JSON.parse(localStorage.getItem("entries") || "[]"),
+    entries: JSON.parse(localStorage.getItem("entries") || "[]").map(e => ({
+      ...e,
+      amount: parseFloat(e.amount)
+    })),
     nextId: JSON.parse(localStorage.getItem("nextId") || "1"),
   };
 
@@ -28,15 +31,10 @@ export default function ExpenseButton() {
 
   const categories = {
     income: ["Salary", "Freelance", "Investment", "Business", "Gift", "Savings", "Other"],
-    expense: ["Housing", "Food", "Transport", "Health", "Entertainment", "Shopping", "Utilities", "Other"],
+    expense: ["Housing", "Food", "Drinks", "Transport", "Health", "Entertainment", "Shopping", "Utilities", "Other"],
   };
 
   const payment_method = ["UPI", "Cash", "Debit/Credit Card", "BTB transfer"];
-
-  // function txns(){
-  //  const raj = txn();
-  //  console.log(raj);
-  // }
 
   const txn = (form) => {
     return {
@@ -44,16 +42,16 @@ export default function ExpenseButton() {
       type: form.type,
       pay_method: form.pay_method,
       description: form.description,
-      amount: form.amount,
+      amount: parseFloat(form.amount),
       category: form.category,
       date: form.date,
     };
   };
 
-  // const getform = () => {
-  //   const wedguj = JSON.parse(localStorage.getItem("enteries"));
-  //   console.log(wedguj);
-  // }
+  const totalExpense = state.entries.filter((e) => e.type === "expense").reduce((s, e) => s + e.amount, 0);
+  const totalIncome = state.entries.filter((e) => e.type === "income").reduce((s, e) => s + e.amount, 0);
+  const balance = totalIncome - totalExpense;
+  const savings = (balance / totalIncome) * 100;
 
   function handleChange(field, value) {
     setForm((f) => ({ ...f, [field]: value, ...(field === "type" ? { category: "" } : {}) }));
@@ -93,6 +91,26 @@ export default function ExpenseButton() {
 
   return (
     <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-center gap-10 mt-20 my-7 mx-7 lg:mx-10">
+        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+          <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Total Expenses</div>
+          <div className="text-2xl font-extrabold tabular-nums text-red-500">{fmt(totalExpense)}</div>
+        </div>
+        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+          <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Total Income</div>
+          <div className="text-2xl font-extrabold tabular-nums text-green-400">{fmt(totalIncome)}</div>
+        </div>
+        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+          <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Balance</div>
+          <div className={`text-2xl font-extrabold tabular-nums ${totalExpense<totalIncome ? "text-green-400" : "text-red-500"} `}>{fmt(balance)}</div>
+        </div>
+        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+          <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Savings Percentage</div>
+          <div className={`text-2xl font-extrabold tabular-nums ${savings<0 ? "text-red-500" : "text-green-400"}`}>{savings.toFixed(2) + "%"}</div>
+        </div>
+      </div>
+
+
       <div className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-7 mx-7 items-start">
         <div className="">
           <div className="rounded-xl border-2 border-gray-500 dark:border-[#605448] p-3.5 dark:bg-[#221E1A] h-full lg:w-127.5">
@@ -186,7 +204,7 @@ export default function ExpenseButton() {
                   type="text"
                   required
                   placeholder="e.g. Coffee with a friend"
-                  maxLength="34"
+                  maxLength="28"
                   value={form.description}
                   className={`bg-amber-50 border-2 dark:bg-gray-200 rounded-xl p-3.5 ${errors.description ? "border-red-700" : ""}`}
                   onChange={(e) => handleChange("description", e.target.value)}
@@ -211,7 +229,7 @@ export default function ExpenseButton() {
             <div className="px-4 my-3 mb-4">
               <span className="font-bold my-3 text-xl text-orange-500">Recent Transactions</span>
             </div>
-            <div className="flex items-center gap-3 px-4 pt-3.5 ">
+            <div className="flex flex-wrap items-center gap-3 px-4 pt-3.5 ">
               {["all", "income", "expense"].map((f) => {
                 const isActive = filter === f;
                 return (
@@ -252,7 +270,7 @@ export default function ExpenseButton() {
                       <tr key={entry.id} className="border-b border-[#1a1e2e] hover:bg-[#2b221a] transition-colors">
                         {/* Date */}
                         <td className="px-4 py-3 text-sm">
-                          <span className="text-slate-500 text-xs whitespace-nowrap">{fmtDate(entry.date)}</span>
+                          <span className="dark:text-gray-400 text-black text-xs whitespace-nowrap">{fmtDate(entry.date)}</span>
                         </td>
                         {/* Description */}
                         <td className="px-4 py-3 text-sm">
@@ -260,7 +278,7 @@ export default function ExpenseButton() {
                         </td>
                         {/* Category badge */}
                         <td className="px-4 py-3 text-sm">
-                          <span className="bg-[#12151f] border border-[#2a2f45] rounded-md px-2 py-0.5 text-xs text-slate-400">
+                          <span className="dark:bg-[#773a07] bg-[#ac5605] border border-[#ac5605] rounded-lg px-2 py-0.5 text-xs text-gray-300">
                             {entry.category}
                           </span>
                         </td>
@@ -278,12 +296,12 @@ export default function ExpenseButton() {
                         </td>
                         {/* Payment Method */}
                         <td className="text-sm text-center">
-                          <span className={`bg-[#12151f] border border-[#2a2f45] rounded-md px-2 py-0.5 text-xs text-slate-400`}>{entry.pay_method}</span>
+                          <span className={`dark:bg-[#773a07] bg-[#ac5605] border border-[#ac5605] rounded-lg px-2 py-0.5 text-xs text-gray-300`}>{entry.pay_method}</span>
                         </td>
                         {/* Delete */}
                         <td className="px-4 py-3 text-sm">
                           <button
-                            className="text-slate-600 hover:text-rose-400 cursor-pointer bg-transparent border-none text-sm px-1.5 py-1 rounded transition-colors"
+                            className="dark:text-gray-400 text-black hover:text-rose-500 cursor-pointer bg-transparent border-none text-sm px-1.5 py-1 rounded transition-colors"
                             onClick={() => dispatch({ type: "DELETE_ENTRY", id: entry.id })}
                             title="Delete"
                           >
