@@ -2,85 +2,10 @@ import React from 'react';
 import Piechart from '../components/PieChart';
 import { useState, useReducer } from "react";
 
-// export default function Landing() {
-const arr = [
-    { food: 20, others: 10, medical: 20, transport: 5, drinks: 15, housing: 16, utilities: 21, shopping: 67, entertainment: 35 },
 
-];
 
-const CATEGORIES = {
-    income: ["Salary", "Freelance", "Investment", "Business", "Gift", "Other"],
-    expense: ["Housing", "Food", "Transport", "Health", "Entertainment", "Shopping", "Utilities", "Other"],
-};
 
-const initialState = {
-    entries: [
-        { id: 1, type: "income", description: "Monthly Salary", category: "Salary", amount: 4500, date: "2026-07-28" },
-        { id: 2, type: "expense", description: "Rent", category: "Housing", amount: 1200, date: "2026-07-30" },
-        { id: 3, type: "expense", description: "Groceries", category: "Food", amount: 185, date: "2026-08-01" },
-        { id: 4, type: "income", description: "Freelance Project", category: "Freelance", amount: 850, date: "2026-08-01" },
-    ],
-    nextId: 5,
-};
-
-function reducer(state, action) {
-    switch (action.type) {
-        case "ADD_ENTRY":
-            return {
-                entries: [{ ...action.payload, id: state.nextId }, ...state.entries],
-                nextId: state.nextId + 1,
-            };
-        case "DELETE_ENTRY":
-            return { ...state, entries: state.entries.filter((e) => e.id !== action.id) };
-        default:
-            return state;
-    }
-}
-
-const EMPTY_FORM = { type: "expense", description: "", category: "", amount: "", date: "" };
-
-export default function ExpenseTracker() {
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const [form, setForm] = useState(EMPTY_FORM);
-    const [errors, setErrors] = useState({});
-    const [filter, setFilter] = useState("all");
-    const [showForm, setShowForm] = useState(false);
-
-    const totalIncome = state.entries.filter((e) => e.type === "income").reduce((s, e) => s + e.amount, 0);
-    const totalExpense = state.entries.filter((e) => e.type === "expense").reduce((s, e) => s + e.amount, 0);
-    const balance = totalIncome - totalExpense;
-
-    const filtered = filter === "all" ? state.entries : state.entries.filter((e) => e.type === filter);
-
-    function validate() {
-        const errs = {};
-        // if (!form.description.trim()) errs.description = "Required";
-        if (!form.category) errs.category = "Required";
-        if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0) errs.amount = "Enter a valid amount";
-        if (!form.date) errs.date = "Required";
-        return errs;
-    }
-
-    function handleSubmit() {
-        const errs = validate();
-        if (Object.keys(errs).length) { setErrors(errs); return; }
-        dispatch({ type: "ADD_ENTRY", payload: { ...form, amount: parseFloat(form.amount) } });
-        setForm(EMPTY_FORM);
-        setErrors({});
-        setShowForm(false);
-    }
-
-    function handleChange(field, value) {
-        setForm((f) => ({ ...f, [field]: value, ...(field === "type" ? { category: "" } : {}) }));
-        setErrors((e) => ({ ...e, [field]: undefined }));
-    }
-
-    const fmt = (n) => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-    const fmtDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-
-    const inputBase = "w-full bg-[#12151f] border border-[#2a2f45] rounded-lg text-slate-200 text-sm px-3 py-2 outline-none appearance-none";
-    const inputErr = "border-rose-500";
-
+export default function landing() {
     const expenseTotals = state.entries
         .filter((e) => e.type === "expense")
         .reduce((acc, e) => {
@@ -89,7 +14,6 @@ export default function ExpenseTracker() {
             return acc;
         }, {});
 
-        
     return (
         <>
             <div className="font-sans bg-[#0f1117] min-h-screen px-5 py-7 text-slate-200 max-w-3xl mx-auto">
@@ -145,7 +69,7 @@ export default function ExpenseTracker() {
                                     <button
                                         key={t}
                                         className={`px-5 py-1.5 rounded-lg text-sm font-semibold cursor-pointer border-none transition-colors
-                    ${isActive ? activeClass : "bg-transparent text-slate-500 hover:text-slate-300"}`}
+                            ${isActive ? activeClass : "bg-transparent text-slate-500 hover:text-slate-300"}`}
                                         onClick={() => handleChange("type", t)}
                                     >
                                         {t === "income" ? "↑ Income" : "↓ Expense"}
@@ -230,7 +154,7 @@ export default function ExpenseTracker() {
                                 <button
                                     key={f}
                                     className={`px-4 py-2 text-sm font-semibold cursor-pointer border-b-2 -mb-px transition-colors bg-transparent border-l-0 border-r-0 border-t-0
-                  ${isActive ? "text-indigo-400 border-indigo-400" : "text-slate-500 border-transparent hover:text-slate-300"}`}
+                          ${isActive ? "text-indigo-400 border-indigo-400" : "text-slate-500 border-transparent hover:text-slate-300"}`}
                                     onClick={() => setFilter(f)}
                                 >
                                     {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -281,7 +205,7 @@ export default function ExpenseTracker() {
                                             {/* Type pill */}
                                             <td className="px-4 py-3 text-sm">
                                                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize
-                        ${entry.type === "income" ? "bg-green-900 text-green-400" : "bg-red-950 text-red-400"}`}>
+                                ${entry.type === "income" ? "bg-green-900 text-green-400" : "bg-red-950 text-red-400"}`}>
                                                     {entry.type === "income" ? "↑" : "↓"} {entry.type}
                                                 </span>
                                             </td>
@@ -308,17 +232,17 @@ export default function ExpenseTracker() {
                         </div>
                     )}
                 </div>
-            <Piechart
-                Housing={expenseTotals["Housing"] || 0}
-                Food={expenseTotals["Food"] || 0}
-                Transport={expenseTotals["Transport"] || 0}
-                Health={expenseTotals["Health"] || 0}
-                Entertainment={expenseTotals["Entertainment"] || 0}
-                Shopping={expenseTotals["Shopping"] || 0}
-                Utilities={expenseTotals["Utilities"] || 0}
-                Drinks={expenseTotals["Drinks"] || 0}
-                Others={expenseTotals["Other"] || 0}
-            />
+                <Piechart
+                    Housing={expenseTotals["Housing"] || 0}
+                    Food={expenseTotals["Food"] || 0}
+                    Transport={expenseTotals["Transport"] || 0}
+                    Health={expenseTotals["Health"] || 0}
+                    Entertainment={expenseTotals["Entertainment"] || 0}
+                    Shopping={expenseTotals["Shopping"] || 0}
+                    Utilities={expenseTotals["Utilities"] || 0}
+                    Drinks={expenseTotals["Drinks"] || 0}
+                    Others={expenseTotals["Other"] || 0}
+                />
             </div>
 
 
@@ -326,8 +250,4 @@ export default function ExpenseTracker() {
     );
 }
 
-// return (
-//     <>
-//     </>
-// );
-// }
+

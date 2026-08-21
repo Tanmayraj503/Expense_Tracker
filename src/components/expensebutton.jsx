@@ -57,7 +57,23 @@ export default function ExpenseButton() {
     setForm((f) => ({ ...f, [field]: value, ...(field === "type" ? { category: "" } : {}) }));
     setErrors((e) => ({ ...e, [field]: undefined }));
   }
+  const monthlyData = state.entries.reduce((acc, entry) => {
+    const month = entry.date.slice(0, 7); // "2026-08" from "2026-08-17"
+    if (!acc[month]) acc[month] = { income: 0, expense: 0 };
+    if (entry.type === "income") acc[month].income += Number(entry.amount);
+    if (entry.type === "expense") acc[month].expense += Number(entry.amount);
+    return acc;
+  }, {});
 
+  const monthlyArray = Object.entries(monthlyData)
+    .sort((a, b) => b[0].localeCompare(a[0])) // latest month first
+    .map(([month, data]) => ({
+      month,
+      income: data.income,
+      expense: data.expense,
+      balance: data.income - data.expense,
+      savings: data.income > 0 ? ((data.income - data.expense) / data.income * 100).toFixed(1) : "0.0",
+    }));
   const validate = () => {
     const errs = {};
     // if (!form.description.trim()) errs.description = "Required";
@@ -92,34 +108,34 @@ export default function ExpenseButton() {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-center gap-10 mt-20 my-7 mx-7 lg:mx-10">
-        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+        <div className="rounded-2xl border-2 border-gray-500 bg-[#fbecdc] dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
           <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Total Expenses</div>
           <div className="text-2xl font-extrabold tabular-nums text-red-500">{fmt(totalExpense)}</div>
         </div>
-        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+        <div className="rounded-2xl border-2 border-gray-500 bg-[#fbecdc]  dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
           <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Total Income</div>
           <div className="text-2xl font-extrabold tabular-nums text-green-400">{fmt(totalIncome)}</div>
         </div>
-        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+        <div className="rounded-2xl border-2 border-gray-500 bg-[#fbecdc]  dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
           <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Balance</div>
-          <div className={`text-2xl font-extrabold tabular-nums ${totalExpense<totalIncome ? "text-green-400" : "text-red-500"} `}>{fmt(balance)}</div>
+          <div className={`text-2xl font-extrabold tabular-nums ${totalExpense < totalIncome ? "text-green-400" : "text-red-500"} `}>{fmt(balance)}</div>
         </div>
-        <div className="rounded-2xl border-2 border-gray-500 dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
+        <div className="rounded-2xl border-2 border-gray-500 bg-[#fbecdc]  dark:border-[#605448] pl-5 py-5 dark:bg-[#221E1A]">
           <div className="text-[15px] font-semibold  tracking-widest dark:text-gray-300 text-black  uppercase mb-1">Savings Percentage</div>
-          <div className={`text-2xl font-extrabold tabular-nums ${savings<0 ? "text-red-500" : "text-green-400"}`}>{savings.toFixed(2) + "%"}</div>
+          <div className={`text-2xl font-extrabold tabular-nums ${savings < 0 ? "text-red-500" : "text-green-400"}`}>{savings.toFixed(2) + "%"}</div>
         </div>
       </div>
 
 
       <div className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-7 mx-7 items-start">
         <div className="">
-          <div className="rounded-xl border-2 border-gray-500 dark:border-[#605448] p-3.5 dark:bg-[#221E1A] h-full lg:w-127.5">
+          <div className="rounded-xl border-2 border-gray-500 bg-[#fbecdc] dark:border-[#605448] p-3.5 dark:bg-[#221E1A] h-full lg:w-127.5">
 
             <div className=" px-4 my-3 mb-4">
               <span className="font-bold my-3 text-xl text-orange-500">Add Transaction</span>
             </div>
 
-            <div className="flex bg-gray-200 p-0.5 rounded-full mx-4 font-semibold mb-4">
+            <div className="flex bg-amber-50 dark:border-0 border border-gray-400  dark:bg-gray-200 p-0.5 rounded-full mx-4 font-semibold mb-4">
               {["income", "expense"].map((t) => {
                 const isActive = form.type === t;
                 const activeClass = t === "income"
@@ -140,10 +156,10 @@ export default function ExpenseButton() {
             <div className=" dark:text-black flex flex-col gap-3 px-4">
 
               {/* Txn category */}
-              <div className=" dark:text-black flex flex-col gap-1 ">
+              <div className=" text-gray-600 flex flex-col gap-1 ">
                 <label className="font-semibold text-orange-500">Category</label>
                 <select
-                  className={`bg-amber-50 border-2 dark:bg-gray-200 rounded-xl appearance-none block p-3.5 ${errors.category ? "border-red-700" : ""}`}
+                  className={`bg-amber-50 border-2 border-gray-400 dark:bg-gray-200 rounded-xl appearance-none block p-3.5 ${errors.category ? "border-red-700" : "dark:border-gray-200 border"}`}
                   value={form.category}
                   onChange={(e) => handleChange("category", e.target.value)}
                 >
@@ -155,7 +171,7 @@ export default function ExpenseButton() {
               </div>
 
               {/* Txn Amount */}
-              <div className=" dark:text-black flex flex-col gap-1 ">
+              <div className=" text-gray-600 flex flex-col gap-1 ">
                 <label className="appearance-none font-semibold text-orange-500">Amount (₹)</label>
                 <input
                   type="number"
@@ -165,13 +181,13 @@ export default function ExpenseButton() {
                   value={form.amount}
                   onChange={(e) => handleChange("amount", e.target.value)}
                   required
-                  className={`${errors.amount ? "border-red-700" : ""} bg-amber-50 border-2  dark:bg-gray-200 rounded-xl p-3.5`}
+                  className={`${errors.amount ? "border-red-700" : "dark:border-gray-200 border"} bg-amber-50 border-2 border-gray-400  dark:bg-gray-200 rounded-xl p-3.5`}
                 />
                 {errors.amount && <span className="text-[10px] text-red-600">{errors.amount}</span>}
               </div>
 
               {/* Txn Date */}
-              <div className=" dark:text-black flex flex-col gap-1 ">
+              <div className=" text-gray-600 flex flex-col gap-1 ">
                 <label className="font-semibold text-orange-500">Date</label>
                 <input
                   type="date"
@@ -179,34 +195,34 @@ export default function ExpenseButton() {
                   onChange={(e) => handleChange("date", e.target.value)}
                   value={form.date}
                   className={`bg-amber-50  dark:bg-gray-200 rounded-xl p-3.5 [&::-webkit-calendar-picker-indicator]:invert
-                   [&::-webkit-calendar-picker-indicator]:hue-rotate-180 border-2 ${errors.date ? "border-red-700" : ""}`} />
+                   [&::-webkit-calendar-picker-indicator]:hue-rotate-180 border-2 border-gray-400 ${errors.date ? "border-red-700" : "dark:border-gray-200 border"}`} />
                 {errors.date && <span className="text-[10px] text-red-600">{errors.date}</span>}
               </div>
 
               {/* Payment method */}
-              <div className=" dark:text-black flex flex-col gap-1 ">
+              <div className=" text-gray-600 flex flex-col gap-1 ">
                 <label className="font-semibold text-orange-500">Mode of Payment</label>
                 <select
-                  className={`bg-amber-50 dark:bg-gray-200 border-2 rounded-xl appearance-none block p-3.5 ${errors.pay_method ? "border-red-700" : ""}`}
+                  className={`bg-amber-50 dark:bg-gray-200 border-2 border-gray-400 rounded-xl appearance-none block p-3.5 ${errors.pay_method ? "border-red-700" : "dark:border-gray-200 border"}`}
                   value={form.pay_method}
                   onChange={(e) => handleChange("pay_method", e.target.value)}
                 >
-                  <option value="" className="disabled">Select payment mode</option>
+                  <option value="" disabled>Select payment mode</option>
                   {payment_method.map((p) => <option value={p} key={p}>{p}</option>)}
                 </select>
                 {errors.pay_method && <span className="text-[10px] text-red-600">{errors.pay_method}</span>}
               </div>
 
               {/* Description */}
-              <div className=" dark:text-black flex flex-col gap-1 ">
-                <label className="font-semibold text-orange-500">Description <span className="text-[13px] text-gray-400">(optional)</span></label>
+              <div className=" text-gray-600 flex flex-col gap-1 ">
+                <label className="font-semibold text-orange-500">Description <span className="text-[13px] text-gray-500 dark:text-gray-400">(optional)</span></label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Coffee with a friend"
                   maxLength="28"
                   value={form.description}
-                  className={`bg-amber-50 border-2 dark:bg-gray-200 rounded-xl p-3.5 ${errors.description ? "border-red-700" : ""}`}
+                  className={`bg-amber-50 border-2 border-gray-400 dark:bg-gray-200 rounded-xl p-3.5 ${errors.description ? "border-red-700" : "dark:border-gray-200 border"}`}
                   onChange={(e) => handleChange("description", e.target.value)}
                 />
                 {errors.description && <span className="text-[10px] text-red-600">{errors.description}</span>}
@@ -225,7 +241,7 @@ export default function ExpenseButton() {
           </div>
         </div>
         <div className="">
-          <div className="rounded-xl border-2 border-gray-500 dark:border-[#605448] p-3.5 dark:bg-[#221E1A] ">
+          <div className="rounded-xl border-2 bg-[#fbecdc] border-gray-500 dark:border-[#605448] p-3.5 dark:bg-[#221E1A] ">
             <div className="px-4 my-3 mb-4">
               <span className="font-bold my-3 text-xl text-orange-500">Recent Transactions</span>
             </div>
@@ -236,7 +252,7 @@ export default function ExpenseButton() {
                   <button
                     key={f}
                     className={`flex px-4 py-1 text-sm font-semibold cursor-pointer bg-amber-50 dark:bg-gray-200 rounded-full 
-                      ${isActive ? "text-orange-500  border-2 " : "text-black border-transparent hover:text-orange-500"}`}
+                      ${isActive ? "text-orange-500  border-2 " : "text-black dark:border-transparent border-gray-400 border hover:text-orange-500"}`}
                     onClick={() => setFilter(f)}>
                     {f.charAt(0).toUpperCase() + f.slice(1)}
                   </button>
@@ -267,14 +283,14 @@ export default function ExpenseButton() {
                   </thead>
                   <tbody>
                     {filtered.map((entry) => (
-                      <tr key={entry.id} className="border-b border-[#1a1e2e] hover:bg-[#2b221a] transition-colors">
+                      <tr key={entry.id} className="border-b border-[#1a1e2e] hover:bg-orange-200 dark:hover:bg-[#2b221a] transition-colors">
                         {/* Date */}
                         <td className="px-4 py-3 text-sm">
                           <span className="dark:text-gray-400 text-black text-xs whitespace-nowrap">{fmtDate(entry.date)}</span>
                         </td>
                         {/* Description */}
                         <td className="px-4 py-3 text-sm">
-                          <span className="text-slate-300 font-medium">{entry.description}</span>
+                          <span className="text-black dark:text-slate-300 font-medium">{entry.description}</span>
                         </td>
                         {/* Category badge */}
                         <td className="px-4 py-3 text-sm">
@@ -290,7 +306,7 @@ export default function ExpenseButton() {
                         </td>
                         {/* Amount */}
                         <td className="px-4 py-3 text-sm">
-                          <span className={`font-semibold font-mono text-[15px] ${entry.type === "income" ? "text-green-400" : "text-rose-400"}`}>
+                          <span className={`font-semibold whitespace-nowrap font-mono text-[15px] ${entry.type === "income" ? "text-green-400" : "text-rose-400"}`}>
                             {entry.type === "income" ? "+" : "-"}{fmt(entry.amount)}
                           </span>
                         </td>
@@ -301,7 +317,7 @@ export default function ExpenseButton() {
                         {/* Delete */}
                         <td className="px-4 py-3 text-sm">
                           <button
-                            className="dark:text-gray-400 text-black hover:text-rose-500 cursor-pointer bg-transparent border-none text-sm px-1.5 py-1 rounded transition-colors"
+                            className="dark:text-gray-400 text-black hover:text-rose-500 cursor-pointer bg-transparent  text-sm px-1.5 py-1 rounded transition-colors"
                             onClick={() => dispatch({ type: "DELETE_ENTRY", id: entry.id })}
                             title="Delete"
                           >
@@ -317,6 +333,35 @@ export default function ExpenseButton() {
           </div>
         </div>
       </div>
+      {monthlyArray.length > 0 && (
+        <div className="mx-7 my-7">
+          <span className="font-bold text-xl text-orange-500">Monthly Breakdown</span>
+          <div className="mt-4 rounded-xl border-2 border-gray-500 dark:border-[#605448] overflow-x-auto dark:bg-[#221E1A] bg-[#fbecdc]">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  {["Month", "Income", "Expense", "Balance", "Savings %"].map(h => (
+                    <th key={h} className="px-4 py-3 text-left text-[11px] font-bold tracking-widest text-slate-200 uppercase bg-orange-500">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {monthlyArray.map(({ month, income, expense, balance, savings }) => (
+                  <tr key={month} className="border-b border-[#1a1e2e] hover:bg-orange-200 dark:hover:bg-[#2b221a] transition-colors">
+                    <td className="px-4 py-3 text-sm font-semibold text-black dark:text-gray-300">
+                      {new Date(month + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-mono whitespace-nowrap font-semibold text-green-400">+{fmt(income)}</td>
+                    <td className="px-4 py-3 text-sm font-mono whitespace-nowrap font-semibold text-rose-400">-{fmt(expense)}</td>
+                    <td className={`px-4 py-3 text-sm font-mono whitespace-nowrap font-semibold ${balance >= 0 ? "text-green-400" : "text-rose-400"}`}>{fmt(balance)}</td>
+                    <td className={`px-4 py-3 text-sm font-mono whitespace-nowrap font-semibold ${Number(savings) >= 0 ? "text-green-400" : "text-rose-400"}`}>{savings}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </>
   );
 }
